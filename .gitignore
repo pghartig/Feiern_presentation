@@ -243,3 +243,6 @@ TSWLatexianTemp*
 
 #generated images
 Images/Output/
+
+# compiles pdf
+*.pdf
