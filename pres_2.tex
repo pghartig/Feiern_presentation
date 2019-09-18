@@ -103,10 +103,10 @@
 		\end{figure}
 
 		\begin{small}
-			Activation function incorporates non-linearity so long as there is tractable
-			 $\Delta f()$ with respect to $w_{i,j}$.  Without non-linear functions, a network of arbitrary
-			 depth can be collapsed to a single layer .
-			\cite{baldi1989neural}
+		\begin{itemize}
+			\item Activation function requires tractable $\Delta f()$ with respect to $w_{i,j}$. 
+			\item Without non-linear functions, a network of arbitrary depth can be collapsed to a single layer\cite{baldi1989neural}
+		\end{itemize}
 		\end{small}
 	\end{column}
 \end{columns}
@@ -114,12 +114,12 @@
 
 
 \begin{frame}[fragile]
-\frametitle{Activation Functions: Sigmoid}
+\frametitle{Activation Functions: Logistic Function}
 \begin{figure}
 		\includegraphics[scale=.4]{Images/Output/sigmoid.png}
 \end{figure}
 		\begin{equation}
-			\sigma(x) = \frac{1}{1+e^{w_{i}^{T}x+b}}
+			\sigma_i(x) = \frac{1}{1+e^{-w_{i}^{T}x-b}}
 		\end{equation}
 \end{frame}
 
@@ -130,8 +130,10 @@
 		\includegraphics[scale=.4]{Images/Output/tanh.png}
 \end{figure}
 		\begin{equation}
-			tanh(x)_i = \frac{e^{x_i}-e^{-x_i}}{e^{x_i}+e^{+x_i}}
+			tanh(x)_i = \frac{e^{w_{i}^{T}x+b}-e^{w_{i}^{T}x+b}}{e^{w_{i}^{T}x+b}+e^{w_{i}^{T}x+b}}
 		\end{equation}
+		% We want average inputs to be 0 for each layer for faster convergence
+		\cite{lecun2012efficient}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -140,14 +142,14 @@
 		\includegraphics[scale=.4]{Images/Output/relu.png}
 \end{figure}
 		\begin{equation}
-			f(x) = max(0,Wx+b)
+			f(x) = max(0,w_{i}^{T}x+b)
 		\end{equation}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Activation Functions: Softmax}
 		\begin{equation}
-			\sigma(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{n}e^{x_j}}
+			\sigma(x)_i = \frac{e^{w_{i}^{T}x+b}}{\sum_{j=1}^{n}e^{w_{i}^{T}x+b}}
 		\end{equation}
 \end{frame}
 
@@ -167,7 +169,7 @@
 		\outputlayer[count=2, title=Output\\layer, text=\y] \linklayers
 	    \end{neuralnetwork}
 	\begin{center}
-	    Prior to the activation function of nodes. Each layer undergoes a transformation into a |l+1| dimensional space.
+	    Prior to the activation function. Input undergoes a transformation.
 	\end{center}
     %Now this cascade of transformations should be optimized to the training data.
 \end{frame}
@@ -178,7 +180,7 @@
 	\begin{figure}
 		\begin{small}
 			\begin{equation}
-			J(W,b;x,y) = [\frac{1}{m}*\sum_{i=1}^{m} J(W,b,x^i,y^i)] + \frac{\lambda}{2}*\sum_{l=1}^{n_l-1}*\sum_{l=1}^{s_l}*\sum_{l=1}^{s_{l+1}}(W_{ji}^{(i)})^2
+			J(W,b;x,y) = [\frac{1}{m}*\sum_{i=1}^{m} J(W,b,x^i,y^i)] + \frac{\lambda}{2}*\sum_{l=1}^{n_l-1}*\sum_{i=1}^{s_l}*\sum_{j=1}^{s_{l+1}}(W_{ji}^{(i)})^2
 			\end{equation}
 		\end{small}
 		\caption{Cost function over a batch of m training examples ($x_i$,$y_i$) \cite{ng2011sparse}}
@@ -196,7 +198,7 @@
 \frametitle{Cost Function}
 	\begin{tiny}
 		\begin{equation}
-			J(W,b;x,y) = [\frac{1}{m}*\sum_{i=1}^{m} J(W,b,x^i,y^i)] + \frac{\lambda}{2}*\sum_{l=1}^{n_l-1}*\sum_{l=1}^{s_l}*\sum_{l=1}^{s_{l+1}}(W_{ji}^{(i)})^2
+			J(W,b;x,y) = [\frac{1}{m}*\sum_{i=1}^{m} J(W,b,x^i,y^i)] + \frac{\lambda}{2}*\sum_{l=1}^{n_l-1}*\sum_{i=1}^{s_l}*\sum_{j=1}^{s_{l+1}}(W_{ji}^{(i)})^2
 			\end{equation}
 	\end{tiny}
 	\normalsize
@@ -215,14 +217,14 @@
 	\end{itemize}
 	\begin{small}
 		Without regularization this searches for the ML model for the \textbf{training} data 
-		\cite{goodfellow2016deep}
+%		\cite{goodfellow2016deep}
 	\end{small}
 \end{frame}
 
 
 \begin{frame}
 	\frametitle{Regularization (Training Data is Expensive)}
-	ML converges asymptotically but we usually don't have infinite data so we enforce priors
+	ML only converges asymptotically so enforce priors
 \end{frame}
 
 
@@ -268,6 +270,7 @@
 		\hiddenlayer[count=2, bias=false, title=Representation\\, text=\hfirst] \linklayers
 		\outputlayer[count=4, title=\\, text=\x] \linklayers
 	    \end{neuralnetwork}
+	    %would be nice to make a reference to robust PCA corresponding to non-linear activation functions
 	\end{figure}
 
 	\begin{scriptsize}
@@ -279,17 +282,17 @@
 
 
 \begin{frame}
-	\frametitle{Interpretting Regularizing with Autoencoders}
+	\frametitle{Interpreting Regularization with Autoencoders}
 	\begin{block}{Classification}
 	%Main point of this slide is to say that in classification types of things, we can interpret regularization
 	%directly as bayesian priors. 
-	Regularization corresponds to priors on parameters of the training data pdf model.
+	Regularization corresponds to priors on parameters of the training data pdf.
 	\end{block}
 
 	\begin{block}{Autoencoder}
 		%Here when we add a sparsity penalty it enforcing a prior on the latent variables of
 			%the data. Note Autoencoders learn latent variables. TODO Add example regularization from Ng paper
-		Autoencoders learn latent variables so regularization corresponds priors on these latent variables.
+		Autoencoders learn latent variables of training data. Regularization enforces priors on these latent variables.
 	\end{block}
 \end{frame}
 
@@ -338,7 +341,7 @@
 	\frametitle{Dividing Channel Resources}
 	\begin{figure}
 	\includegraphics[scale=1]{Images/Output/FDMA-TDMA-CDMA-Frequency-Time-division.png}
-		\caption{Multiple Access Schemes (include SDMA/NOMA?)}
+		\caption{Multiple Access Schemes}
 	\end{figure}
 \end{frame}
 
@@ -346,8 +349,9 @@
 \begin{frame}[squeeze]
 \frametitle{Sinusoids in LTI systems}
 
-	\begin{figure}
-			\includegraphics[scale=.4, height=2cm]{Images/Output/Multipath_Channel.png}
+	\begin{figure}[
+	]
+			\includegraphics[scale=.6, height=3cm, width=3cm]{Images/Output/Multipath_Channel.png}
 		\caption{Multipath Channel}
 	\end{figure}
 
@@ -362,18 +366,21 @@
 %			An infinite sinusoid does not convey information
 %		\end{block}
 
-			\begin{equation*}
-				x(t) = e^{j2\pi f_c t}
-			\end{equation*}
-
+			
+			Channel
 			\begin{equation*}
 				\sum_{n=1}^{n} c_n*\delta(t-\tau_n)
+			\end{equation*}
+			
+			Transmit Signal... no information
+			\begin{equation*}
+				x(t) = e^{j2\pi f_c t}
 			\end{equation*}
 \end{frame}
 
 \begin{frame}
 	\begin{block}{Solution step 1}
-		Truncate the sinusoid with a rectangular window in time...
+		Truncate and modulate the sinusoid with a rectangular window in time...
 		Convolves frequency with sinc
 	\end{block}
 
@@ -388,31 +395,33 @@
 	\frametitle{OFDM Outline}
 	\begin{figure}
 		\includegraphics[scale=.4]{Images/Output/ofdm.png}
-		\caption{\footcite{ofdmillustration}}
+		\caption{\cite{ofdmillustration}}
 	\end{figure}
-	Discrete frequency  multiplied by channel frequency response -> circular convolution in time.
+	\begin{small}
+		Discrete frequency  multiplied by channel frequency response -> circular convolution
+	\end{small}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Multiplexing}
-	\begin{block}{ORTHOGONAL Frequency Division MULTIPLEXING}
-		N-point time sample contains N frequencies at modulated phase/magnitude. 
-		The result can carry information on all N \underline{orthogonal} sinusoids.
+	\frametitle{Dividing Resource with OFDM}
+	\begin{block}{Multiplexing}
+		N time samples contain up to N orthogonal frequencies at modulated phase/magnitude. 
 	\end{block}
 	*Users are assigned to sets of frequencies within an N-point DFT.
 \end{frame}
 
 \begin{frame}
-	\frametitle{Synchonization }
+	\frametitle{Synchronization }
 	%\begin{equation}
-	Orthogonality of the N "sub-carriers" depends on equally spaced samples.
+%	Orthogonality of the N "sub-carriers" depends on equally spaced samples.
 	%\end{equation}
-
-	Sampling period and total number of samples need to be synchronized to preserve sub-carrier orthogonality. 
-	This results in strict requirements on transmit/receive oscillator synchronization.
-	-Show how synchronization mismatch can cause problems
-	Just include this with mention that it will be important for next section
+	\begin{itemize}
+		\item Sampling period and total number of samples must be synchronized to preserve sub-carrier orthogonality.
+		\item Strict tolerance on transmit/receive oscillator and sampling synchronization for communications in general.
+		\item Cyclic Prefix can be correlated with subsequent received signal for synchronization. 
 	\cite{sandell1995timing}
+	\end{itemize}
+	
 \end{frame}
 
 
@@ -425,26 +434,33 @@
 		\item Large Peak to Average Power Ratio (\textbf{PAPR})
 			\begin{itemize}
 				\item{Variance of single die roll: PAPR = 2.37
-					\begin{equation}
+					\begin{equation*}
 						E[|x|^2] = 15.166
-					\end{equation}}
+					\end{equation*}}
 
 				\item{Variance of sum of two dice rolled: PAPR = 2.62
-					\begin{equation}
+					\begin{equation*}
 						E[|x_1+x_2|^2] = 54.833
-					\end{equation}}
+					\end{equation*}}
 			\end{itemize}
 		
 		\item Cycle Prefix overheard proportional to channel response length
 
-		\item Sensitive to asynchronous transmission
+		\item Sensitive to asynchronous transmission (CP helps though)
+		
+		\item Single tap equalization
+		
 
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Current Deployment of OFDM}
-	
+	\begin{itemize}
+		\item 802.11
+		\item WiMAX
+		\item LTE
+	\end{itemize}
 \end{frame}
 
 
@@ -455,49 +471,73 @@
 \subsection{OFDM + Autoendcoder}
 
 
-\frame{\tableofcontents[currentsection,hideothersubsections]}
+\frame{\tableofcontents[currentsection,hidesubsections]}
 
 %Point of this slide is to recall what a full autoencoder implementation of the communication system would look like
-%\againframe{DNA}
+%\
+\frame{DNA}
 
 \begin{frame}[label=OFDM]
 	\frametitle{OFDM Outline}
 	\begin{figure}
+			\centering
 		\includegraphics[scale=.4]{Images/Output/ofdm.png}
 	\end{figure}
 \end{frame}
 
 
-\begin{frame}[label=OFDM]
+\begin{frame}[squeeze]
 	\frametitle{End-to-End Autoencoder}
 	\begin{figure}[t]
-		\includegraphics[scale=.4]{Images/endtoend.png}
+		\includegraphics[scale=.3]{Images/endtoend.png}
 		\centering
-		\caption{\footcite{felix2018ofdm}}
+		\caption{\cite{felix2018ofdm}}
 	\end{figure}
+	\centering
 	\begin{itemize}
-		\item normalization layer
-		\item sequence detector  -> based on channel length (why would this be needed in OFDM?)
-		\item discuss difficulties implied by continuous transmission a
+		\item normalization layer -> based on average power budget
+		\item discuss difficulties implied by continuous transmission
 	\end{itemize}
 \end{frame}
 
 
+\begin{frame}[squeeze]
+	\frametitle{End-to-End Autoencoder}
+	\begin{figure}[t]
+		\includegraphics[scale=.4]{Images/Output/IntegratedAEOFDM.png}
+		\centering
+		\caption{\cite{felix2018ofdm}}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[squeeze]
+	\frametitle{MMSE Equalization}
+		\begin{itemize}
+			\item Minimize variance of difference between transmitted and received
+			\item In SISO case simplifies to complex conjugate
+		\end{itemize}
+\end{frame}
+
+\begin{frame}[squeeze]
+	\frametitle{Equalization Comparison}
+	\begin{figure}[t]
+		\includegraphics[scale=.4]{Images/Output/equalizationcomparison.png}
+		\centering
+		\caption{\cite{felix2018ofdm}}
+	\end{figure}
+			\begin{itemize}
+			\item Incorporating pilot information without explicit equalization
+		\end{itemize}
+\end{frame}
 
 \subsubsection{Previous Work}
 
-\begin{frame}
-	\frametitle{Naive Modeling}
-	Intuitively this gives the network freedom to learn the best channel equalization. Classifying will require the
-	network to perform a marginalization over all variables in the channel.
-	%Observed to be difficult in intial work
-\end{frame}
-
-\begin{frame}
-	\frametitle{Synchonization}
-	Why this might be difficult. Resolved in previous work using additional NN.
-	OFDM allows for simple sampling synchronization using autocorrelation with the cyclic prefix.
-\end{frame}
+%\begin{frame}
+%	\frametitle{Why add integrate OFDM}
+%	In classification case, network is marginalizing over the training data.
+%	
+%	%Observed to be difficult in intial work
+%\end{frame}
 
 
 
@@ -509,38 +549,39 @@
 	\begin{itemize}
 		\item Reduce required training data and increase training speed
 		\item Improved generalization
+		\item direct NN towards appropriate latent variables
 	\end{itemize}
 \end{frame}
 
-\begin{frame}
-	\frametitle{RTN -- OFDM}
-	We take length $w_{fft}$ inverse fft over $w_{fft}$ messages with each message being length $\frac{n}{2}$ long. The
-	result is that we send $\frac{n}{2}$ symbols over each carrier in the multicarrier system. All $\frac{n}{2}$ can be
-	equalized with the same pilot.
-\end{frame}
+%\begin{frame}
+%	\frametitle{RTN -- OFDM}
+%	We take length $w_{fft}$ inverse fft over $w_{fft}$ messages with each message being length $\frac{n}{2}$ long. The
+%	result is that we send $\frac{n}{2}$ symbols over each carrier in the multicarrier system. All $\frac{n}{2}$ can be
+%	equalized with the same pilot.
+%\end{frame}
 
 \begin{frame}
 	\frametitle{Channel Model}
-	
+	\begin{figure}
+			\includegraphics[scale=.6, height=3cm, width=3cm]{Images/Output/Multipath_Channel.png}
+	\end{figure}
+	\begin{itemize}
+		\item Random channel parameters during training
+	\end{itemize}
 \end{frame}
 
 
 \begin{frame}
 	\frametitle{Training}
-	Discuss the two stages of training
+	\begin{enumerate}
+			\item TODO change to numbers for stages
+		\item Offline training
+		\item Update online based on decoded transmission
+	\end{enumerate}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Sequence Detector}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Equalization}
-	\begin{itemize}
-		\item Pilot tones with MMSE Equalizer
-		\item Pilot tones without explicit equalizer
-		\item No pilot or explicit equalizer
-	\end{itemize}
 \end{frame}
 
 \subsection{ViterbiNet}
@@ -588,7 +629,7 @@ Each decoded block provides information with which to update the model
 
 \begin{frame}
 \begin{tiny}
-	\printbibliography[title={Whole bibliography}]
+	\printbibliography[title={References}]
 
 \end{tiny}
 \end{frame}
